@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "29f4cd2804df7016ec306f0fa1f0b63277dde7f7d91e4a6664177156fbe54b3e"
+            "sha256": "56b4847c30ebfec96a055ea5586be16d6bd4e584267775261ca2cbf9fe0d10ff"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -65,6 +65,15 @@
             "index": "pypi",
             "markers": "python_version >= '3.10'",
             "version": "==0.141.1"
+        },
+        "geoalchemy2": {
+            "hashes": [
+                "sha256:1489a1d106519542a79c97cd0b4c537d80462c353610ebc2429cf2c43daac717",
+                "sha256:450f427f4bc3cf2d5ddee0af3763aed0f3eea2384e7c9a99798d8f1508279322"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.10'",
+            "version": "==0.20.0"
         },
         "greenlet": {
             "hashes": [
@@ -325,6 +334,14 @@
             ],
             "markers": "python_version >= '3.9'",
             "version": "==3.0.3"
+        },
+        "packaging": {
+            "hashes": [
+                "sha256:94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79",
+                "sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+            ],
+            "markers": "python_version >= '3.9'",
+            "version": "==26.3"
         },
         "psycopg2-binary": {
             "hashes": [
