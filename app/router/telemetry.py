@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from geoalchemy2.elements import WKTElement
-from ..schemas import TelemetryIn
+from datetime import datetime
+from ..schemas import TelemetryIn, TelemetryOut
 from ..models import Telemetry
 from ..database import get_db
 
@@ -24,3 +26,42 @@ def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db)):
     db.add(telemetry)
     db.commit()
     return {"status": "ok"}
+
+
+@router.get("/latest", response_model=list[TelemetryOut])
+def get_latest_positions(db: Session = Depends(get_db)):
+    """Última posición de cada vehículo."""
+    sql = text("""
+        SELECT DISTINCT ON (vehicle_id)
+            vehicle_id, timestamp,
+            ST_Y(location::geometry) AS lat,
+            ST_X(location::geometry) AS lon,
+            alt, speed, course, sats, hdop, ignition
+        FROM telemetry
+        ORDER BY vehicle_id, timestamp DESC
+    """)
+    rows = db.execute(sql).mappings().all()
+    return [dict(r) for r in rows]
+
+
+@router.get("/history/{vehicle_id}", response_model=list[TelemetryOut])
+def get_vehicle_history(
+    vehicle_id: str,
+    start: datetime = Query(..., description="Inicio del rango"),
+    end: datetime = Query(..., description="Fin del rango"),
+    db: Session = Depends(get_db),
+):
+    """Historial de posiciones de un vehículo en un rango de tiempo."""
+    sql = text("""
+        SELECT
+            vehicle_id, timestamp,
+            ST_Y(location::geometry) AS lat,
+            ST_X(location::geometry) AS lon,
+            alt, speed, course, sats, hdop, ignition
+        FROM telemetry
+        WHERE vehicle_id = :vid
+          AND timestamp BETWEEN :start AND :end
+        ORDER BY timestamp ASC
+    """)
+    rows = db.execute(sql, {"vid": vehicle_id, "start": start, "end": end}).mappings().all()
+    return [dict(r) for r in rows]
