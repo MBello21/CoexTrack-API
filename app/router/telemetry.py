@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from geoalchemy2.elements import WKTElement
@@ -6,12 +6,42 @@ from datetime import datetime
 from ..schemas import TelemetryIn, TelemetryOut
 from ..models import Telemetry
 from ..database import get_db
+from typing import List
 
 router = APIRouter()
 
+# Gestión simple de conexiones
+class ConnectionManager:
+    def __init__(self):
+        self.connections: List[WebSocket] = []
+
+    async def connect(self, ws: WebSocket):
+        await ws.accept()
+        self.connections.append(ws)
+
+    def disconnect(self, ws: WebSocket):
+        self.connections.remove(ws)
+
+    async def broadcast(self, data: dict):
+        for ws in self.connections:
+            try:
+                await ws.send_json(data)
+            except:
+                self.connections.remove(ws)
+
+manager = ConnectionManager()
+
+@router.websocket("/ws")
+async def websocket_endpoint(ws: WebSocket):
+    await manager.connect(ws)
+    try:
+        while True:
+            await ws.receive_text()  # mantiene la conexión viva
+    except WebSocketDisconnect:
+        manager.disconnect(ws)
 
 @router.post("")
-def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db)):
+async def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db)):
     telemetry = Telemetry(
         vehicle_id=data.vehicle_id,
         timestamp=data.timestamp,
@@ -25,6 +55,10 @@ def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db)):
     )
     db.add(telemetry)
     db.commit()
+
+    # Notifica a todos los frontends
+    await manager.broadcast(data.model_dump())
+
     return {"status": "ok"}
 
 
