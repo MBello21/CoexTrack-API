@@ -1,8 +1,8 @@
-"""telemetry
+"""add aspa_active battery alert fields
 
-Revision ID: 871d02ab85dc
-Revises: 3185ed1ac7b2
-Create Date: 2026-08-08 20:59:08.532331
+Revision ID: f8e2ed9a9e37
+Revises: 68fcb6b92052
+Create Date: 2026-08-18 06:50:12.642593
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '871d02ab85dc'
-down_revision: Union[str, Sequence[str], None] = '3185ed1ac7b2'
+revision: str = 'f8e2ed9a9e37'
+down_revision: Union[str, Sequence[str], None] = '68fcb6b92052'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

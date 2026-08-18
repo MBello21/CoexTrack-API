@@ -3,15 +3,16 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from geoalchemy2.elements import WKTElement
 from datetime import datetime
+from typing import List
 from ..schemas import TelemetryIn, TelemetryOut
 from ..models import Telemetry
 from ..database import get_db
-from typing import List
+
 
 router = APIRouter()
 
-# Gestión simple de conexiones
-class ConnectionManager:
+
+class ConecctionManager:
     def __init__(self):
         self.connections: List[WebSocket] = []
 
@@ -23,22 +24,29 @@ class ConnectionManager:
         self.connections.remove(ws)
 
     async def broadcast(self, data: dict):
+        dead = []
         for ws in self.connections:
             try:
                 await ws.send_json(data)
             except:
-                self.connections.remove(ws)
+                dead.append(ws)
+        for ws in dead:
+            self.connections.remove(ws)
+        
 
-manager = ConnectionManager()
+manager = ConecctionManager()
+
 
 @router.websocket("/ws")
-async def websocket_endpoint(ws: WebSocket):
+async def websocket_endopoint(ws: WebSocket):
     await manager.connect(ws)
+
     try:
         while True:
-            await ws.receive_text()  # mantiene la conexión viva
+            await ws.receive_text()
     except WebSocketDisconnect:
         manager.disconnect(ws)
+
 
 @router.post("")
 async def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db)):
@@ -52,15 +60,17 @@ async def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db)):
         sats=data.sats,
         hdop=data.hdop,
         ignition=data.ignition,
+        aspa_active=data.aspa_active,
+        battery_voltage=data.battery_voltage,
+        battery_current_ma=data.battery_current_ma,
+        alert=data.alert,
     )
+
     db.add(telemetry)
     db.commit()
 
-    # Notifica a todos los frontends
-    await manager.broadcast(data.model_dump())
-
+    await manager.broadcast(data.model_dump(mode='json'))
     return {"status": "ok"}
-
 
 @router.get("/latest", response_model=list[TelemetryOut])
 def get_latest_positions(db: Session = Depends(get_db)):
@@ -70,7 +80,8 @@ def get_latest_positions(db: Session = Depends(get_db)):
             vehicle_id, timestamp,
             ST_Y(location::geometry) AS lat,
             ST_X(location::geometry) AS lon,
-            alt, speed, course, sats, hdop, ignition
+            alt, speed, course, sats, hdop, ignition,
+            aspa_active, battery_voltage, battery_current_ma, alert
         FROM telemetry
         ORDER BY vehicle_id, timestamp DESC
     """)
@@ -91,11 +102,13 @@ def get_vehicle_history(
             vehicle_id, timestamp,
             ST_Y(location::geometry) AS lat,
             ST_X(location::geometry) AS lon,
-            alt, speed, course, sats, hdop, ignition
+            alt, speed, course, sats, hdop, ignition,
+            aspa_active, battery_voltage, battery_current_ma, alert
         FROM telemetry
         WHERE vehicle_id = :vid
           AND timestamp BETWEEN :start AND :end
         ORDER BY timestamp ASC
     """)
-    rows = db.execute(sql, {"vid": vehicle_id, "start": start, "end": end}).mappings().all()
+    rows = db.execute(
+        sql, {"vid": vehicle_id, "start": start, "end": end}).mappings().all()
     return [dict(r) for r in rows]
