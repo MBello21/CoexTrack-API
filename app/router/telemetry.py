@@ -32,13 +32,13 @@ class ConecctionManager:
                 dead.append(ws)
         for ws in dead:
             self.connections.remove(ws)
-        
+
 
 manager = ConecctionManager()
 
 
 @router.websocket("/ws")
-async def websocket_endopoint(ws: WebSocket):
+async def websocket_endpoint(ws: WebSocket):
     await manager.connect(ws)
 
     try:
@@ -71,6 +71,7 @@ async def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db)):
 
     await manager.broadcast(data.model_dump(mode='json'))
     return {"status": "ok"}
+
 
 @router.get("/latest", response_model=list[TelemetryOut])
 def get_latest_positions(db: Session = Depends(get_db)):
