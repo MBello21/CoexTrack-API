@@ -27,3 +27,5 @@ class Vehicle(Base):
     driver: Mapped[Optional[str]] = mapped_column(
         String(55), unique=False, nullable=True)
     engine_type: Mapped[str] = mapped_column(String(55), unique=False)
+    last_address: Mapped[Optional[str]] = mapped_column(
+        String(255), unique=False, nullable=True)

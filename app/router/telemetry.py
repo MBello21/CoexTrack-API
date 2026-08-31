@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect, BackgroundTasks
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from geoalchemy2.elements import WKTElement
@@ -7,6 +7,7 @@ from typing import List
 from ..schemas import TelemetryIn, TelemetryOut, TelemetryWithVehicleOut
 from ..models import Telemetry
 from ..database import get_db
+from ..services.geocode_services import update_vehicle_address
 
 
 router = APIRouter()
@@ -49,7 +50,7 @@ async def websocket_endpoint(ws: WebSocket):
 
 
 @router.post("")
-async def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db)):
+async def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db), background_tasks: BackgroundTasks = BackgroundTasks()):
     telemetry = Telemetry(
         vehicle_id=data.vehicle_id,
         timestamp=data.timestamp,
@@ -70,6 +71,8 @@ async def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db)):
     db.commit()
 
     await manager.broadcast(data.model_dump(mode='json'))
+    background_tasks.add_task(update_vehicle_address,
+                              data.vehicle_id, data.lat, data.lon)
     return {"status": "ok"}
 
 
@@ -77,16 +80,16 @@ async def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db)):
 def get_latest_positions(db: Session = Depends(get_db)):
     """Última posición de cada vehículo."""
     sql = text("""
-        SELECT DISTINCT ON (telemetry.vehicle_id)
-            telemetry.vehicle_id, timestamp,
+        SELECT DISTINCT ON (vehicles.vehicle_id)
+            vehicles.vehicle_id, timestamp,
             ST_Y(location::geometry) AS lat,
             ST_X(location::geometry) AS lon,
             alt, speed, course, sats, hdop, ignition,
             aspa_active, battery_voltage, battery_current_ma, alert,vehicles.plate, 
-            vehicles.brand, vehicles.model, vehicles.vehicle_type, vehicles.driver, vehicles.engine_type
-        FROM telemetry
-        LEFT JOIN vehicles ON telemetry.vehicle_id = vehicles.vehicle_id
-        ORDER BY telemetry.vehicle_id, timestamp DESC
+            vehicles.brand, vehicles.model, vehicles.vehicle_type, vehicles.driver, vehicles.engine_type,vehicles.last_address
+        FROM vehicles
+        LEFT JOIN telemetry ON telemetry.vehicle_id = vehicles.vehicle_id
+        ORDER BY vehicles.vehicle_id, timestamp DESC
     """)
     rows = db.execute(sql).mappings().all()
     return [dict(r) for r in rows]

@@ -15,6 +15,7 @@ psycopg2-binary = "*"
 alembic = "*"
 pydantic-settings = "*"
 geoalchemy2 = "*"
+httpx = "*"
 
 [dev-packages]
 
