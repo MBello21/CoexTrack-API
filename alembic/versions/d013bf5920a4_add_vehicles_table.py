@@ -1,8 +1,8 @@
-"""initial
+"""add vehicles table
 
-Revision ID: 3185ed1ac7b2
-Revises: 
-Create Date: 2026-08-08 19:22:10.067737
+Revision ID: d013bf5920a4
+Revises: e109b3d3806c
+Create Date: 2026-08-29 20:44:59.057659
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '3185ed1ac7b2'
-down_revision: Union[str, Sequence[str], None] = None
+revision: str = 'd013bf5920a4'
+down_revision: Union[str, Sequence[str], None] = 'e109b3d3806c'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
