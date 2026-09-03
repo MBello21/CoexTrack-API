@@ -1,8 +1,8 @@
-"""add aspa_active battery alert fields
+"""initial schema with devices
 
-Revision ID: f8e2ed9a9e37
-Revises: 68fcb6b92052
-Create Date: 2026-08-18 06:50:12.642593
+Revision ID: 87f055f6c281
+Revises: 
+Create Date: 2026-09-03 18:30:37.811290
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'f8e2ed9a9e37'
-down_revision: Union[str, Sequence[str], None] = '68fcb6b92052'
+revision: str = '87f055f6c281'
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

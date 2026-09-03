@@ -50,9 +50,9 @@ async def websocket_endpoint(ws: WebSocket):
 
 
 @router.post("")
-async def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db), background_tasks: BackgroundTasks = BackgroundTasks()):
+async def create_telemetry(data: TelemetryIn, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     telemetry = Telemetry(
-        vehicle_id=data.vehicle_id,
+        device_id=data.device_id,
         timestamp=data.timestamp,
         location=WKTElement(f"POINT({data.lon} {data.lat})", srid=4326),
         alt=data.alt,
@@ -72,7 +72,7 @@ async def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db), bac
 
     await manager.broadcast(data.model_dump(mode='json'))
     background_tasks.add_task(update_vehicle_address,
-                              data.vehicle_id, data.lat, data.lon)
+                              data.device_id, data.lat, data.lon)
     return {"status": "ok"}
 
 
@@ -80,24 +80,26 @@ async def create_telemetry(data: TelemetryIn, db: Session = Depends(get_db), bac
 def get_latest_positions(db: Session = Depends(get_db)):
     """Última posición de cada vehículo."""
     sql = text("""
-        SELECT DISTINCT ON (vehicles.vehicle_id)
-            vehicles.vehicle_id, timestamp,
+        SELECT DISTINCT ON (devices.device_id)
+            devices.device_id, timestamp,
             ST_Y(location::geometry) AS lat,
             ST_X(location::geometry) AS lon,
             alt, speed, course, sats, hdop, ignition,
             aspa_active, battery_voltage, battery_current_ma, alert,vehicles.plate, 
             vehicles.brand, vehicles.model, vehicles.vehicle_type, vehicles.driver, vehicles.engine_type,vehicles.last_address
-        FROM vehicles
-        LEFT JOIN telemetry ON telemetry.vehicle_id = vehicles.vehicle_id
-        ORDER BY vehicles.vehicle_id, timestamp DESC
+        FROM devices
+        LEFT JOIN vehicles ON vehicles.device_id = devices.device_id AND vehicles.end_date IS NULL
+        LEFT JOIN telemetry ON telemetry.device_id = devices.device_id
+        WHERE devices.active = TRUE
+        ORDER BY devices.device_id, timestamp DESC
     """)
     rows = db.execute(sql).mappings().all()
     return [dict(r) for r in rows]
 
 
-@router.get("/history/{vehicle_id}", response_model=list[TelemetryWithVehicleOut])
+@router.get("/history/{device_id}", response_model=list[TelemetryWithVehicleOut])
 def get_vehicle_history(
-    vehicle_id: str,
+    device_id: str,
     start: datetime = Query(..., description="Inicio del rango"),
     end: datetime = Query(..., description="Fin del rango"),
     db: Session = Depends(get_db),
@@ -105,20 +107,21 @@ def get_vehicle_history(
     """Historial de posiciones de un vehículo en un rango de tiempo."""
     sql = text("""
         SELECT
-            telemetry.vehicle_id, timestamp,
+            telemetry.device_id, timestamp,
             ST_Y(location::geometry) AS lat,
             ST_X(location::geometry) AS lon,
             alt, speed, course, sats, hdop, ignition,
             aspa_active, battery_voltage, battery_current_ma, alert,vehicles.plate, 
-            vehicles.brand, vehicles.model, vehicles.vehicle_type, vehicles.driver, vehicles.engine_type
+            vehicles.brand, vehicles.model, vehicles.vehicle_type, vehicles.driver, vehicles.engine_type,vehicles.last_address
         FROM telemetry
-        LEFT JOIN vehicles ON telemetry.vehicle_id = vehicles.vehicle_id
-        WHERE telemetry.vehicle_id = :vid
+        LEFT JOIN devices ON telemetry.device_id = devices.device_id
+        LEFT JOIN vehicles ON vehicles.device_id = devices.device_id AND vehicles.end_date IS NULL
+        WHERE telemetry.device_id = :vid
           AND timestamp BETWEEN :start AND :end
         ORDER BY timestamp ASC
     """)
     rows = db.execute(
-        sql, {"vid": vehicle_id, "start": start, "end": end}).mappings().all()
+        sql, {"vid": device_id, "start": start, "end": end}).mappings().all()
     return [dict(r) for r in rows]
 
 
@@ -126,7 +129,7 @@ def get_vehicle_history(
 async def create_telemetry_batch(data: List[TelemetryIn], db: Session = Depends(get_db)):
     for d in data:
         telemetry = Telemetry(
-            vehicle_id=d.vehicle_id,
+            device_id=d.device_id,
             timestamp=d.timestamp,
             location=WKTElement(f"POINT({d.lon} {d.lat})", srid=4326),
             alt=d.alt,

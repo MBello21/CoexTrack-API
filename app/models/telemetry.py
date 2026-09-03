@@ -7,17 +7,17 @@ from datetime import datetime
 from ..database import Base
 
 if TYPE_CHECKING:
-    from .vehicles import Vehicle
+    from .device import Device
 
 
 class Telemetry(Base):
     __tablename__ = 'telemetry'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    vehicle_id: Mapped[str] = mapped_column(
-        ForeignKey("vehicles.vehicle_id"), nullable=True)
-    vehicle: Mapped["Vehicle"] = relationship(
-        "Vehicle",
+    device_id: Mapped[str] = mapped_column(
+        ForeignKey("devices.device_id"), nullable=True)
+    device: Mapped["Device"] = relationship(
+        "Device",
         back_populates='telemetry'
     )
     timestamp: Mapped[datetime] = mapped_column(
