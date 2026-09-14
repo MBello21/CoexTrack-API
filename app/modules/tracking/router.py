@@ -4,10 +4,10 @@ from sqlalchemy import text
 from geoalchemy2.elements import WKTElement
 from datetime import datetime
 from typing import List
-from ..schemas import TelemetryIn, TelemetryOut, TelemetryWithVehicleOut
-from ..models import Telemetry
-from ..database import get_db
-from ..services.geocode_services import update_vehicle_address
+from .schemas import TelemetryIn, TelemetryWithVehicleOut
+from .models import Telemetry
+from ...database import get_db
+from app.shared.geocode import update_vehicle_address
 
 
 router = APIRouter()

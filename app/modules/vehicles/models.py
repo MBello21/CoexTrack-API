@@ -3,10 +3,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional, TYPE_CHECKING
 from datetime import datetime
 
-from ..database import Base
+from ...database import Base
 
 if TYPE_CHECKING:
-    from .device import Device
+    from app.modules.devices.models import Device
 
 
 class Vehicle(Base):

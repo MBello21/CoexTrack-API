@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-from .router.telemetry import router as telemetry_router
-from .router.vehicles import router as vehicle_router
-from .router.device import router as device_router
+from app.modules.tracking.router import router as telemetry_router
+from app.modules.vehicles.router import router as vehicle_router
+from app.modules.devices.router import router as device_router
 
 api_router = APIRouter()
 

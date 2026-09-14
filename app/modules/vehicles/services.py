@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 
 from typing import List
 
-from ..models.vehicles import Vehicle
-from ..schemas.vehicles import VehicleIn, VehicleOut
+from .models import Vehicle
+from .schemas import VehicleIn
 
 
 def get_vehicle(

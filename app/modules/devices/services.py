@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 
 from typing import List
 
-from ..models.device import Device
-from ..schemas.device import DeviceIn, DeviceOut
+from .models import Device
+from .schemas import DeviceIn
 
 
 def get_device(
