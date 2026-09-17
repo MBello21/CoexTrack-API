@@ -4,7 +4,7 @@ from typing import Optional
 
 
 class TelemetryIn(BaseModel):
-    vehicle_id: str
+    device_id: str
     timestamp: datetime
     lat: float
     lon: float
@@ -21,7 +21,7 @@ class TelemetryIn(BaseModel):
 
 
 class TelemetryOut(BaseModel):
-    vehicle_id: str
+    device_id: str
     timestamp: Optional[datetime] = None
     lat: Optional[float] = None
     lon: Optional[float] = None
