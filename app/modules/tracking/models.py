@@ -1,4 +1,4 @@
-from sqlalchemy import String, Boolean, DateTime, Float, ForeignKey, func
+from sqlalchemy import String, Boolean, DateTime, Float, ForeignKey,Integer, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from geoalchemy2 import Geography
 from typing import Optional, TYPE_CHECKING
@@ -8,6 +8,7 @@ from ...database import Base
 
 if TYPE_CHECKING:
     from app.modules.devices.models import Device
+    from app.modules.usage_sessions.models import UsageSessions
 
 
 class Telemetry(Base):
@@ -20,6 +21,12 @@ class Telemetry(Base):
         "Device",
         back_populates='telemetry'
     )
+    session_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("usage_sessions.id"), nullable=True)
+    session: Mapped[Optional["UsageSessions"]] = relationship(
+        "UsageSessions",
+        back_populates='telemetry'
+    )
     timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False)
     location: Mapped[str] = mapped_column(
@@ -27,7 +34,7 @@ class Telemetry(Base):
     alt: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     speed: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     course: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    sats: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    sats: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     hdop: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     ignition: Mapped[bool] = mapped_column(Boolean, default=False)
     aspa_active: Mapped[bool] = mapped_column(Boolean, default=False)
