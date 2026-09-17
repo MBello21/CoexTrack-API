@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey, Date
+from sqlalchemy import String, ForeignKey, Date,Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional, TYPE_CHECKING
 from datetime import datetime
@@ -27,3 +27,12 @@ class Vehicle(Base):
         String(255), unique=False, nullable=True)
     start_date: Mapped[datetime] = mapped_column(Date, nullable=False)
     end_date: Mapped[Optional[datetime]] = mapped_column(Date, nullable=True)
+
+    __table_args__ = (
+        Index(
+            "uq_one_active_vehicle_per_device",
+            "device_id",
+            unique=True,
+            postgresql_where=(end_date.is_(None))
+        ),
+    )
