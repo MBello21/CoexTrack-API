@@ -8,6 +8,7 @@ from ...database import Base
 if TYPE_CHECKING:
     from app.modules.tracking.models import Telemetry
     from app.modules.vehicles.models import Vehicle
+    from app.modules.usage_sessions.models import UsageSessions
 
 
 class Device(Base):
@@ -19,12 +20,14 @@ class Device(Base):
     vehicle: Mapped[list['Vehicle']] = relationship(
         "Vehicle",
         back_populates="device",
-        cascade="all, delete-orphan"
     )
     telemetry: Mapped[list['Telemetry']] = relationship(
         "Telemetry",
         back_populates="device",
-        cascade="all, delete-orphan"
     )
+    usage_session: Mapped[list['UsageSessions']] = relationship(
+                "UsageSessions",
+                back_populates="device",
+            )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now())

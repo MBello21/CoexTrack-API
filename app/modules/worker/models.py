@@ -7,6 +7,7 @@ from ...database import Base
 
 if TYPE_CHECKING:
     from app.modules.worker_code.models import WorkerCode
+    from app.modules.usage_sessions.models import UsageSessions
 
 
 class Worker(Base):
@@ -22,6 +23,10 @@ class Worker(Base):
     worker_code: Mapped["WorkerCode"] = relationship(back_populates="worker")
     worker_code_id: Mapped[int] = mapped_column(
             ForeignKey("worker_code.id"), nullable=False)
+    usage_session: Mapped[list['UsageSessions']] = relationship(
+                    "UsageSessions",
+                    back_populates="worker",
+                )
     start_date: Mapped[datetime] = mapped_column(Date, nullable=False)
     end_date: Mapped[Optional[datetime]] = mapped_column(Date, nullable=True)
 

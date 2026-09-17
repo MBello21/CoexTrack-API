@@ -7,6 +7,8 @@ from ...database import Base
 
 if TYPE_CHECKING:
     from app.modules.devices.models import Device
+    from app.modules.usage_sessions.models import UsageSessions
+    from app.modules.worker.models import Worker
 
 
 class Vehicle(Base):
@@ -20,11 +22,13 @@ class Vehicle(Base):
     brand: Mapped[str] = mapped_column(String(55), unique=False)
     model: Mapped[str] = mapped_column(String(55), unique=False)
     vehicle_type: Mapped[str] = mapped_column(String(55), unique=False)
-    driver: Mapped[Optional[str]] = mapped_column(
-        String(55), unique=False, nullable=True)
     engine_type: Mapped[str] = mapped_column(String(55), unique=False)
     last_address: Mapped[Optional[str]] = mapped_column(
         String(255), unique=False, nullable=True)
+    usage_session: Mapped[list['UsageSessions']] = relationship(
+            "UsageSessions",
+            back_populates="vehicle",
+        )
     start_date: Mapped[datetime] = mapped_column(Date, nullable=False)
     end_date: Mapped[Optional[datetime]] = mapped_column(Date, nullable=True)
 
