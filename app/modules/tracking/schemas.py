@@ -4,27 +4,10 @@ from typing import Optional
 
 
 class TelemetryIn(BaseModel):
-    vehicle_id: str
+    device_id: str
     timestamp: datetime
     lat: float
-    long: float
-    alt: Optional[float] = None
-    speed: Optional[float] = None
-    course: Optional[float] = None
-    sats: Optional[float] = None
-    hdop: Optional[float] = None
-    igntion: bool = False
-    aspa_active: bool = False
-    battery_voltage: Optional[float] = None
-    battery_current_ma: Optional[float] = None
-    alert: Optional[str] = None
-
-
-class TelemetryOut(BaseModel):
-    vehicle_id: str
-    timestamp: datetime
-    lat: float
-    long: float
+    lon: float
     alt: Optional[float] = None
     speed: Optional[float] = None
     course: Optional[float] = None
@@ -36,5 +19,32 @@ class TelemetryOut(BaseModel):
     battery_current_ma: Optional[float] = None
     alert: Optional[str] = None
 
+
+class TelemetryOut(BaseModel):
+    device_id: str
+    timestamp: Optional[datetime] = None
+    lat: Optional[float] = None
+    lon: Optional[float] = None
+    alt: Optional[float] = None
+    speed: Optional[float] = None
+    course: Optional[float] = None
+    sats: Optional[float] = None
+    hdop: Optional[float] = None
+    ignition: Optional[bool] = False
+    aspa_active: Optional[bool] = False
+    battery_voltage: Optional[float] = None
+    battery_current_ma: Optional[float] = None
+    alert: Optional[str] = None
+
     class Config:
         from_attributes = True
+
+
+class TelemetryWithVehicleOut(TelemetryOut):
+    plate: Optional[str] = None
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    vehicle_type: Optional[str] = None
+    driver: Optional[str] = None
+    engine_type: Optional[str] = None
+    last_address: Optional[str] = None

@@ -1,8 +1,8 @@
-"""telemetry
+"""add geofences model
 
-Revision ID: 871d02ab85dc
-Revises: 3185ed1ac7b2
-Create Date: 2026-08-08 20:59:08.532331
+Revision ID: e75259ea4c4c
+Revises: 7b6cb9e7e95c
+Create Date: 2026-09-18 08:07:59.376517
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '871d02ab85dc'
-down_revision: Union[str, Sequence[str], None] = '3185ed1ac7b2'
+revision: str = 'e75259ea4c4c'
+down_revision: Union[str, Sequence[str], None] = '7b6cb9e7e95c'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

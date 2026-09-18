@@ -1,0 +1,98 @@
+from pydantic import BaseModel
+from datetime import datetime
+from typing import Optional
+
+from .enum import StatusEnum, EndReason
+
+
+class UsageSessionIn(BaseModel):
+
+    vehicle_id: int
+    worker_id: int
+    start_odometer: float
+    start_location: str
+    trip_purpose: Optional[str]
+    pre_check_notes: Optional[str]
+
+
+class UsageSessionEnd(BaseModel):
+
+    end_odometer: float
+    end_location: str
+    end_reason: EndReason
+
+
+class UsageSeesionOut(BaseModel):
+    id: int
+    vehicle: VehicleSummary
+    worker: WorkerSummary
+    device_id: str
+    status: StatusEnum
+    start_time: datetime
+    start_odometer: float
+    start_location: str
+    trip_purpose: Optional[str]
+    pre_check_notes: Optional[str]
+    end_time: Optional[datetime]
+    end_odometer: Optional[float]
+    end_location: Optional[str]
+    total_km: Optional[float]
+    total_seconds: Optional[int]
+    end_reason: Optional[EndReason]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class UsageSessionsWithData(BaseModel):
+    id: int
+    vehicle: VehicleDetails
+    worker: WorkerDetails
+    device_id: str
+    status: StatusEnum
+    start_time: datetime
+    start_odometer: float
+    start_location: str
+    trip_purpose: Optional[str]
+    pre_check_notes: Optional[str]
+    end_time: Optional[datetime]
+    end_odometer: Optional[float]
+    end_location: Optional[str]
+    total_km: Optional[float]
+    total_seconds: Optional[int]
+    end_reason: Optional[EndReason]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class VehicleDetails(BaseModel):
+    plate: Optional[str] = None
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    vehicle_type: Optional[str] = None
+    engine_type: Optional[str] = None
+
+
+class VehicleSummary(BaseModel):
+    plate: Optional[str] = None
+    brand: Optional[str] = None
+    model: Optional[str] = None
+
+
+class WorkerSummary(BaseModel):
+    name: str
+    last_name: str
+    dni: str
+
+
+class WorkerDetails(BaseModel):
+    category: str
+    name: str
+    last_name: str
+    phone: str
+    dni: str
+    worker_code: str
+    start_date: datetime

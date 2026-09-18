@@ -3,6 +3,10 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[scripts]
+
+start = "uvicorn app.main:app --reload"
+
 [packages]
 fastapi = "*"
 uvicorn = {extras = ["standard"], version = "*"}
@@ -11,6 +15,7 @@ psycopg2-binary = "*"
 alembic = "*"
 pydantic-settings = "*"
 geoalchemy2 = "*"
+httpx = "*"
 
 [dev-packages]
 
