@@ -10,7 +10,6 @@ class VehicleIn(BaseModel):
     brand: str
     model: str
     vehicle_type: str
-    driver: Optional[str] = None
     engine_type: str
     start_date: datetime
 
@@ -23,7 +22,6 @@ class VehicleOut(BaseModel):
     brand: str
     model: str
     vehicle_type: str
-    driver: Optional[str] = None
     engine_type: str
     start_date: datetime
     end_date: Optional[datetime] = None
