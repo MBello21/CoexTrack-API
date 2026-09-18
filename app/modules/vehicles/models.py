@@ -8,7 +8,7 @@ from ...database import Base
 if TYPE_CHECKING:
     from app.modules.devices.models import Device
     from app.modules.usage_sessions.models import UsageSessions
-    from app.modules.worker.models import Worker
+    from app.modules.vehicle_geofences.models import VehicleGeofences
 
 
 class Vehicle(Base):
@@ -27,6 +27,10 @@ class Vehicle(Base):
         String(255), unique=False, nullable=True)
     usage_session: Mapped[list['UsageSessions']] = relationship(
             "UsageSessions",
+            back_populates="vehicle",
+        )
+    vehicle_geofences: Mapped[list['VehicleGeofences']] = relationship(
+            "VehicleGeofences",
             back_populates="vehicle",
         )
     start_date: Mapped[datetime] = mapped_column(Date, nullable=False)
