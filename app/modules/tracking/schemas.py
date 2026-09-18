@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
+from ...shared.schemas import VehicleDetails, WorkerSummary
+
 
 class TelemetryIn(BaseModel):
     device_id: str
@@ -40,11 +42,13 @@ class TelemetryOut(BaseModel):
         from_attributes = True
 
 
-class TelemetryWithVehicleOut(TelemetryOut):
-    plate: Optional[str] = None
-    brand: Optional[str] = None
-    model: Optional[str] = None
-    vehicle_type: Optional[str] = None
-    driver: Optional[str] = None
-    engine_type: Optional[str] = None
-    last_address: Optional[str] = None
+class TelemetryWithDataOut(TelemetryOut):
+    vehicle: VehicleDetails
+    worker: Optional[WorkerSummary]
+    
+
+    class Config:
+        from_attributes = True 
+
+
+

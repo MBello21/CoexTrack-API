@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 from .enum import StatusEnum, EndReason
+from ...shared.schemas import VehicleSummary, VehicleDetails, WorkerDetails, WorkerSummary
 
 
 class UsageSessionIn(BaseModel):
@@ -22,7 +23,7 @@ class UsageSessionEnd(BaseModel):
     end_reason: EndReason
 
 
-class UsageSeesionOut(BaseModel):
+class UsageSessionOut(BaseModel):
     id: int
     vehicle: VehicleSummary
     worker: WorkerSummary
@@ -68,31 +69,3 @@ class UsageSessionsWithData(BaseModel):
         from_attributes = True
 
 
-class VehicleDetails(BaseModel):
-    plate: Optional[str] = None
-    brand: Optional[str] = None
-    model: Optional[str] = None
-    vehicle_type: Optional[str] = None
-    engine_type: Optional[str] = None
-
-
-class VehicleSummary(BaseModel):
-    plate: Optional[str] = None
-    brand: Optional[str] = None
-    model: Optional[str] = None
-
-
-class WorkerSummary(BaseModel):
-    name: str
-    last_name: str
-    dni: str
-
-
-class WorkerDetails(BaseModel):
-    category: str
-    name: str
-    last_name: str
-    phone: str
-    dni: str
-    worker_code: str
-    start_date: datetime
