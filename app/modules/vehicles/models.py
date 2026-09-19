@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey, Date,Index
+from sqlalchemy import String, ForeignKey, Date, Index, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional, TYPE_CHECKING
 from datetime import datetime
@@ -23,16 +23,17 @@ class Vehicle(Base):
     model: Mapped[str] = mapped_column(String(55), unique=False)
     vehicle_type: Mapped[str] = mapped_column(String(55), unique=False)
     engine_type: Mapped[str] = mapped_column(String(55), unique=False)
+    odometer: Mapped[float] = mapped_column(Float, nullable=True)
     last_address: Mapped[Optional[str]] = mapped_column(
         String(255), unique=False, nullable=True)
     usage_session: Mapped[list['UsageSessions']] = relationship(
-            "UsageSessions",
-            back_populates="vehicle",
-        )
+        "UsageSessions",
+        back_populates="vehicle",
+    )
     vehicle_geofences: Mapped[list['VehicleGeofences']] = relationship(
-            "VehicleGeofences",
-            back_populates="vehicle",
-        )
+        "VehicleGeofences",
+        back_populates="vehicle",
+    )
     start_date: Mapped[datetime] = mapped_column(Date, nullable=False)
     end_date: Mapped[Optional[datetime]] = mapped_column(Date, nullable=True)
 

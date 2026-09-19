@@ -8,12 +8,14 @@ class VehicleDetails(BaseModel):
     model: Optional[str] = None
     vehicle_type: Optional[str] = None
     engine_type: Optional[str] = None
+    odometer: Optional[float] = None
 
 
 class VehicleSummary(BaseModel):
     plate: Optional[str] = None
     brand: Optional[str] = None
     model: Optional[str] = None
+    odometer: Optional[float] = None
 
 
 class WorkerSummary(BaseModel):

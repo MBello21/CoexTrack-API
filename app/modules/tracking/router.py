@@ -4,7 +4,7 @@ from sqlalchemy import text
 from geoalchemy2.elements import WKTElement
 from datetime import datetime
 from typing import List
-from .schemas import TelemetryIn, TelemetryWithVehicleOut
+from .schemas import TelemetryIn, TelemetryWithDataOut
 from .models import Telemetry
 from ...database import get_db
 from app.shared.geocode import update_vehicle_address
@@ -76,7 +76,7 @@ async def create_telemetry(data: TelemetryIn, background_tasks: BackgroundTasks,
     return {"status": "ok"}
 
 
-@router.get("/latest", response_model=list[TelemetryWithVehicleOut])
+@router.get("/latest", response_model=list[TelemetryWithDataOut])
 def get_latest_positions(db: Session = Depends(get_db)):
     """Última posición de cada vehículo."""
     sql = text("""
@@ -97,7 +97,7 @@ def get_latest_positions(db: Session = Depends(get_db)):
     return [dict(r) for r in rows]
 
 
-@router.get("/history/{device_id}", response_model=list[TelemetryWithVehicleOut])
+@router.get("/history/{device_id}", response_model=list[TelemetryWithDataOut])
 def get_vehicle_history(
     device_id: str,
     start: datetime = Query(..., description="Inicio del rango"),
