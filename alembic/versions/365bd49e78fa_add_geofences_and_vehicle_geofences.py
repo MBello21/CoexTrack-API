@@ -1,8 +1,8 @@
-"""initial
+"""add geofences and vehicle_geofences
 
-Revision ID: 3185ed1ac7b2
-Revises: 
-Create Date: 2026-08-08 19:22:10.067737
+Revision ID: 365bd49e78fa
+Revises: e75259ea4c4c
+Create Date: 2026-09-18 08:47:23.283366
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '3185ed1ac7b2'
-down_revision: Union[str, Sequence[str], None] = None
+revision: str = '365bd49e78fa'
+down_revision: Union[str, Sequence[str], None] = 'e75259ea4c4c'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
