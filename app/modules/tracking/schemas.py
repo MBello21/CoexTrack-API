@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
+from pydantic import model_validator
+from geoalchemy2.shape import to_shape
 
 from ...shared.schemas import VehicleDetails, WorkerSummary
 
@@ -22,7 +24,6 @@ class TelemetryIn(BaseModel):
     battery_current_ma: Optional[float] = None
     alert: Optional[str] = None
 
-
 class TelemetryOut(BaseModel):
     device_id: str
     session_id: Optional[int] = None
@@ -42,20 +43,32 @@ class TelemetryOut(BaseModel):
 
     class Config:
         from_attributes = True
-
+    @model_validator(mode="before")
+    @classmethod
+    def extract_coords(cls, data):
+        if hasattr(data, "location") and data.location:
+            shape = to_shape(data.location)
+            data.lat = shape.y
+            data.lon = shape.x
+        return data
 
 class TelemetryWithDataOut(TelemetryOut):
-    vehicle: VehicleDetails
-    worker: Optional[WorkerSummary]
-    
+    vehicle: Optional[VehicleDetails] = None
+    worker: Optional[WorkerSummary] = None
 
     class Config:
         from_attributes = True 
 
+    @model_validator(mode="before")
+    @classmethod
+    def extract_relations(cls, data):
+        if hasattr(data, "device") and data.device:
+            active = [v for v in data.device.vehicle if v.end_date is None]
+            if active:
+                data.vehicle = active[0]
+        if hasattr(data, "session") and data.session:
+            data.worker = data.session.worker
+        return data
 
-class TelemetryLatestOut(TelemetryOut):
-    plate: Optional[str] = None
-    brand: Optional[str] = None
-    model: Optional[str] = None
-    vehicle_type: Optional[str] = None
-    engine_type: Optional[str] = None
+
+
