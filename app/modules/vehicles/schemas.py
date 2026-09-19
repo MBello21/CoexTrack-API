@@ -11,6 +11,7 @@ class VehicleIn(BaseModel):
     model: str
     vehicle_type: str
     engine_type: str
+    odometer: float
     start_date: datetime
 
 
@@ -23,6 +24,7 @@ class VehicleOut(BaseModel):
     model: str
     vehicle_type: str
     engine_type: str
+    odometer: float
     start_date: datetime
     end_date: Optional[datetime] = None
 

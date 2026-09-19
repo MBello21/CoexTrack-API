@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .router_global import api_router
 from .database import Base, engine
+from app.models import *
 
 app = FastAPI(
     title="COEX Telemetry API",
