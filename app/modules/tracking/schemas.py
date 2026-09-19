@@ -7,6 +7,7 @@ from ...shared.schemas import VehicleDetails, WorkerSummary
 
 class TelemetryIn(BaseModel):
     device_id: str
+    session_id: Optional[int] = None
     timestamp: datetime
     lat: float
     lon: float
@@ -24,6 +25,7 @@ class TelemetryIn(BaseModel):
 
 class TelemetryOut(BaseModel):
     device_id: str
+    session_id: Optional[int] = None
     timestamp: Optional[datetime] = None
     lat: Optional[float] = None
     lon: Optional[float] = None
@@ -51,4 +53,9 @@ class TelemetryWithDataOut(TelemetryOut):
         from_attributes = True 
 
 
-
+class TelemetryLatestOut(TelemetryOut):
+    plate: Optional[str] = None
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    vehicle_type: Optional[str] = None
+    engine_type: Optional[str] = None

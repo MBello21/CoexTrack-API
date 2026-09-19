@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from pydantic import field_validator
+from geoalchemy2.shape import to_shape
 from datetime import datetime
 from typing import Optional
 
@@ -45,6 +47,15 @@ class UsageSessionOut(BaseModel):
     class Config:
         from_attributes = True
 
+    @field_validator("start_location", "end_location", mode="before")
+    @classmethod
+    def convert_wkb_to_wkt(cls, v):
+        if v is None:
+            return v
+        if isinstance(v, str):
+            return v
+        return to_shape(v).wkt
+
 
 class UsageSessionsWithData(BaseModel):
     id: int
@@ -67,5 +78,14 @@ class UsageSessionsWithData(BaseModel):
 
     class Config:
         from_attributes = True
+        
+    @field_validator("start_location", "end_location", mode="before")
+    @classmethod
+    def convert_wkb_to_wkt(cls, v):
+        if v is None:
+            return v
+        if isinstance(v, str):
+            return v
+        return to_shape(v).wkt
 
 

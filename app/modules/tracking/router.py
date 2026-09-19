@@ -4,7 +4,7 @@ from sqlalchemy import text
 from geoalchemy2.elements import WKTElement
 from datetime import datetime
 from typing import List
-from .schemas import TelemetryIn, TelemetryWithDataOut
+from .schemas import TelemetryIn, TelemetryLatestOut
 from .models import Telemetry
 from ...database import get_db
 from app.shared.geocode import update_vehicle_address
@@ -53,6 +53,7 @@ async def websocket_endpoint(ws: WebSocket):
 async def create_telemetry(data: TelemetryIn, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     telemetry = Telemetry(
         device_id=data.device_id,
+        session_id=data.session_id,
         timestamp=data.timestamp,
         location=WKTElement(f"POINT({data.lon} {data.lat})", srid=4326),
         alt=data.alt,
@@ -76,17 +77,17 @@ async def create_telemetry(data: TelemetryIn, background_tasks: BackgroundTasks,
     return {"status": "ok"}
 
 
-@router.get("/latest", response_model=list[TelemetryWithDataOut])
+@router.get("/latest", response_model=list[TelemetryLatestOut])
 def get_latest_positions(db: Session = Depends(get_db)):
     """Última posición de cada vehículo."""
     sql = text("""
         SELECT DISTINCT ON (devices.device_id)
-            devices.device_id, timestamp,
+            telemetry.device_id, telemetry.session_id, timestamp,
             ST_Y(location::geometry) AS lat,
             ST_X(location::geometry) AS lon,
             alt, speed, course, sats, hdop, ignition,
             aspa_active, battery_voltage, battery_current_ma, alert,vehicles.plate, 
-            vehicles.brand, vehicles.model, vehicles.vehicle_type, vehicles.driver, vehicles.engine_type,vehicles.last_address
+            vehicles.brand, vehicles.model, vehicles.vehicle_type, vehicles.engine_type
         FROM devices
         LEFT JOIN vehicles ON vehicles.device_id = devices.device_id AND vehicles.end_date IS NULL
         LEFT JOIN telemetry ON telemetry.device_id = devices.device_id
@@ -97,7 +98,7 @@ def get_latest_positions(db: Session = Depends(get_db)):
     return [dict(r) for r in rows]
 
 
-@router.get("/history/{device_id}", response_model=list[TelemetryWithDataOut])
+@router.get("/history/{device_id}", response_model=list[TelemetryLatestOut])
 def get_vehicle_history(
     device_id: str,
     start: datetime = Query(..., description="Inicio del rango"),
@@ -107,12 +108,12 @@ def get_vehicle_history(
     """Historial de posiciones de un vehículo en un rango de tiempo."""
     sql = text("""
         SELECT
-            telemetry.device_id, timestamp,
+            telemetry.device_id, telemetry.session_id, timestamp,
             ST_Y(location::geometry) AS lat,
             ST_X(location::geometry) AS lon,
             alt, speed, course, sats, hdop, ignition,
             aspa_active, battery_voltage, battery_current_ma, alert,vehicles.plate, 
-            vehicles.brand, vehicles.model, vehicles.vehicle_type, vehicles.driver, vehicles.engine_type,vehicles.last_address
+            vehicles.brand, vehicles.model, vehicles.vehicle_type, vehicles.engine_type
         FROM telemetry
         LEFT JOIN devices ON telemetry.device_id = devices.device_id
         LEFT JOIN vehicles ON vehicles.device_id = devices.device_id AND vehicles.end_date IS NULL

@@ -21,8 +21,8 @@ class Worker(Base):
         String(25), unique=True, nullable=True)
     dni: Mapped[str] = mapped_column(String(10), nullable=False, unique=True)
     worker_code: Mapped["WorkerCode"] = relationship(back_populates="worker")
-    worker_code_id: Mapped[int] = mapped_column(
-            ForeignKey("worker_code.id"), nullable=False)
+    worker_code_id: Mapped[str] = mapped_column(
+            ForeignKey("worker_code.worker_code"), nullable=False)
     usage_session: Mapped[list['UsageSessions']] = relationship(
                     "UsageSessions",
                     back_populates="worker",

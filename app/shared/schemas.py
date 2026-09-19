@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
+
 class VehicleDetails(BaseModel):
     plate: Optional[str] = None
     brand: Optional[str] = None
@@ -10,6 +11,9 @@ class VehicleDetails(BaseModel):
     engine_type: Optional[str] = None
     odometer: Optional[float] = None
 
+    class Config:
+        from_attributes = True
+
 
 class VehicleSummary(BaseModel):
     plate: Optional[str] = None
@@ -17,11 +21,17 @@ class VehicleSummary(BaseModel):
     model: Optional[str] = None
     odometer: Optional[float] = None
 
+    class Config:
+        from_attributes = True
+
 
 class WorkerSummary(BaseModel):
     name: str
     last_name: str
     dni: str
+
+    class Config:
+        from_attributes = True
 
 
 class WorkerDetails(BaseModel):
@@ -30,5 +40,8 @@ class WorkerDetails(BaseModel):
     last_name: str
     phone: str
     dni: str
-    worker_code: str
+    worker_code_id: str
     start_date: datetime
+
+    class Config:
+        from_attributes = True

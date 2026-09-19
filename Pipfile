@@ -16,6 +16,7 @@ alembic = "*"
 pydantic-settings = "*"
 geoalchemy2 = "*"
 httpx = "*"
+shapely = "*"
 
 [dev-packages]
 
