@@ -108,6 +108,5 @@ def delete_geofence(
 
     db.delete(geofence)
     db.commit()
-    db.refresh()
 
     return
