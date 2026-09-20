@@ -8,7 +8,7 @@ class GeofenceIn(BaseModel):
     name: str
     geometry: str
     geofence_type: str
-    active: bool | True
+    active: bool = True
     description: Optional[str]
 
 
@@ -19,6 +19,9 @@ class GeofencesOut(BaseModel):
     geofence_type: str
     active: bool
     description: Optional[str]
+
+    class Config:
+        from_attributes = True
 
     @model_validator(mode="before")
     @classmethod
