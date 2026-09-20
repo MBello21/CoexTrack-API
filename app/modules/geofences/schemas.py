@@ -29,4 +29,12 @@ class GeofencesOut(BaseModel):
         if hasattr(data, "geometry") and data.geometry:
             from geoalchemy2.shape import to_shape
             data.geometry = to_shape(data.geometry).wkt
-        return data
+            return data
+
+
+class GeofenceUpdate(BaseModel):
+    name: Optional[str]
+    geometry: Optional[str]
+    geofence_type: Optional[str]
+    active: Optional[bool] = True
+    description: Optional[str]
