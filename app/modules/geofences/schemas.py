@@ -8,7 +8,7 @@ class GeofenceIn(BaseModel):
     name: str
     geometry: str
     geofence_type: str
-    active: bool | True
+    active: bool = True
     description: Optional[str]
 
 
@@ -20,10 +20,21 @@ class GeofencesOut(BaseModel):
     active: bool
     description: Optional[str]
 
+    class Config:
+        from_attributes = True
+
     @model_validator(mode="before")
     @classmethod
     def convert_geometry(cls, data):
         if hasattr(data, "geometry") and data.geometry:
             from geoalchemy2.shape import to_shape
             data.geometry = to_shape(data.geometry).wkt
-        return data
+            return data
+
+
+class GeofenceUpdate(BaseModel):
+    name: Optional[str]
+    geometry: Optional[str]
+    geofence_type: Optional[str]
+    active: Optional[bool] = True
+    description: Optional[str]

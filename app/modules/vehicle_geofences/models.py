@@ -27,5 +27,6 @@ class VehicleGeofences (Base):
     alert_on_exit: Mapped[bool] = mapped_column(Boolean)
 
     __table_args__ = (
-                        UniqueConstraint("vehicle_id", "geofence_id", name="uq_vehicle_geofence"),
-                    )
+        UniqueConstraint("vehicle_id", "geofence_id",
+                         name="uq_vehicle_geofence"),
+    )
