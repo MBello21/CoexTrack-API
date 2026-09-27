@@ -19,6 +19,7 @@ def post_geofence(
     try:
 
         geofence = create_geofence(db, geofence_data)
+
         return GeofencesOut.model_validate(geofence)
 
     except ValueError as e:

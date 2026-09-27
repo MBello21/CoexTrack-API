@@ -17,6 +17,7 @@ pydantic-settings = "*"
 geoalchemy2 = "*"
 httpx = "*"
 shapely = "*"
+head = "*"
 
 [dev-packages]
 
