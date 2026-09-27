@@ -34,8 +34,7 @@ def create_geofence(
     )
 
     db.add(geofence)
-    db.commit()
-    db.refresh(geofence)
+    db.flush()
 
     return geofence
 
@@ -101,7 +100,7 @@ def delete_geofence(
     geofence_id: int
 ) -> None:
 
-    geofence=db.query(Geofences).filter(Geofences.id == geofence_id).first()
+    geofence = db.query(Geofences).filter(Geofences.id == geofence_id).first()
 
     if geofence is None:
         raise LookupError(f"Geofence {geofence_id} not found")

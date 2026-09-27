@@ -6,6 +6,7 @@ from ...database import get_db
 
 from .schemas import GeofenceIn, GeofencesOut, GeofenceUpdate
 from .services import create_geofence, get_geofences, get_geofence_by_id, patch_geofence, delete_geofence
+from app.modules.vehicle_geofences.service import create_vehicle_geofence
 
 
 router = APIRouter()
@@ -19,7 +20,11 @@ def post_geofence(
     try:
 
         geofence = create_geofence(db, geofence_data)
-
+        vehicle_geofence = create_vehicle_geofence(
+            db, geofence.id, geofence_data.vehicle_id)
+        db.commit()
+        db.refresh(geofence)
+        db.refresh(vehicle_geofence)
         return GeofencesOut.model_validate(geofence)
 
     except ValueError as e:

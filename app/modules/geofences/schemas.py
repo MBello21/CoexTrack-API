@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from pydantic import model_validator
 
-from typing import Optional
+from typing import Optional, List
+from app.modules.vehicle_geofences.schemas import VehicleGeofenceOut
 
 
 class GeofenceIn(BaseModel):
@@ -10,6 +11,7 @@ class GeofenceIn(BaseModel):
     geofence_type: str
     active: bool = True
     description: Optional[str]
+    vehicle_id: int
 
 
 class GeofencesOut(BaseModel):
@@ -19,6 +21,7 @@ class GeofencesOut(BaseModel):
     geofence_type: str
     active: bool
     description: Optional[str]
+    vehicle_geofences: List[VehicleGeofenceOut]
 
     class Config:
         from_attributes = True
@@ -29,7 +32,7 @@ class GeofencesOut(BaseModel):
         if hasattr(data, "geometry") and data.geometry:
             from geoalchemy2.shape import to_shape
             data.geometry = to_shape(data.geometry).wkt
-            return data
+        return data
 
 
 class GeofenceUpdate(BaseModel):
